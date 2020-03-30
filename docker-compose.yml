@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+    nginx:
+        # 만들어질 container 이름
+        container_name: nginx
+        image: nginx:alpine
+
+        # Dockerfile의 위치
+        # :wq!build: .
+
+        # 컨테이너 끼리 내부적으로 연결할 때의 alias
+        # 예를 들어 A:B 의 경우 이 컨테이너 내에서 B라는 이름으로 A에 연결 할 수 있다.
+        # 여기서는 nginx에서 app이라는 도메인을 통해서 app 컨테이너에 접근할 수 있다.
+        links:
+          - service:service
+
+        # 열어줄 포트
+        # 호스트와 연결할 포트:외부에 노출할 포트
+        ports:
+            - 80:80
+
+    service:
+        container_name: service
+        build: .
+        # 환경변수를 지정할 수 있음.
+        environment:
+            NODE_ENV: local
+        ports:
+            - "3000:3000"
+        links:
+            - rbmq:app_rbmq
+            - pgsql:app_db
+
+    pgsql:
+        container_name: pgsql
+        image: postgres:12-alpine
+        ports:
+          - "5432:5432"
+
+        # 데이터 볼륨 지정
+        # 호스트 디렉터리:컨테이터 디렉터리
+        # 컨테이너 내부에서 해당 경로에 접근하면 지정한 호스트 디렉터리로 접근할 수 있다.
+        # 데이터베이스의 경우 유지되어야 할 파일의 위치를 볼륨으로 지정해 주면
+        # 볼륨을 삭제하지 않는 한 컨테이너가 재기동되어도 영속성이 유지된다.
+        volumes:
+          - "./pgdata:/var/lib/postgresql/data"
+
+        environment:
+            - POSTGRES_DB=mydb
+            - POSTGRES_USER=ssp
+            - POSTGRES_PASSWORD=ssp1!
+            - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+
+    rbmq:
+        container_name: rabbitmq
+        image: rabbitmq:3-management-alpine
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            RABBITMQ_ERLANG_COOKIE: "type-script-example-01"
+            RABBITMQ_DEFAULT_USER: "rabbitmq"
+            RABBITMQ_DEFAULT_PASS: "rabbitmq"
+            RABBITMQ_DEFAULT_VHOST: "/"
+
+
+
