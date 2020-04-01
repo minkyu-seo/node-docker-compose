@@ -5,9 +5,6 @@ class App {
 
   /**
    * @ class App
-   * @ method bootstrap
-   * @ static
-   *
    */
   public static bootstrap(): App {
     return new App();

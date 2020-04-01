@@ -9,7 +9,7 @@ const { app } = new App();
 
 interface Err extends Error {
   status: number
-  data?: any
+  data: any
 }
 
 app.listen(port, () => console.log(`Express server listening at ${port}`))
