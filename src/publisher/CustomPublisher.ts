@@ -13,6 +13,8 @@ export default class CustomPublisher extends Publisher {
     super(conn, preparePublisher);
   }
 
+  console.log('test');
+
   sendToQueue(queue: string, content: Buffer, options: {}): Promise<void> {
     return super.sendToQueue(queue, content, options);
   }
